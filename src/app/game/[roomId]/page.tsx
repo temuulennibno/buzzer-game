@@ -18,7 +18,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   useEffect(() => {
-    QRCode.toDataURL(`https://buzzer-game-delta.vercel.app/game/play/{roomId}`, { errorCorrectionLevel: "H" })
+    QRCode.toDataURL(`https://buzzer-game-delta.vercel.app/game/play/${roomId}`, { errorCorrectionLevel: "H" })
       .then((url: string) => {
         setQrCodeUrl(url);
       })
@@ -51,6 +51,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     client.channels.get(`room-${roomId}`).publish("clicks", clicks);
   }, [clicks]);
+  const readyToPlay = (players.length !== 0 && !started) || clicks.length === 0;
 
   return (
     <div className="w-full h-screen flex items-center justify-center flex-col gap-6 fixed inset-0">
@@ -69,7 +70,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
         ))}
       </ol>
       {!started && <>{qrCodeUrl ? <img src={qrCodeUrl} alt="QR Code" width={300} /> : <p>Generating QR code...</p>}</>}
-      <Button onClick={startGame} className={`w-full h-20 fixed left-0 right-0 bottom-0 text-4xl ${!started || (clicks.length === 0 && "opacity-50 pointer-events-none")}`}>
+      <Button onClick={startGame} className={`w-full h-20 fixed left-0 right-0 bottom-0 text-4xl ${readyToPlay && "opacity-50 pointer-events-none"}`}>
         Start Game
       </Button>
     </div>
