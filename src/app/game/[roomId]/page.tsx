@@ -25,21 +25,37 @@ export default function Page({ params }: { params: { roomId: string } }) {
       .catch((err: unknown) => {
         console.error("Error generating QR Code", err);
       });
-
-    client.channels.get(`room-${roomId}`).subscribe("join", (message) => {
-      const players = [...clicks];
-      const newPlayer = message.data;
-      !players.includes(newPlayer) && players.push(newPlayer);
-      setPlayers(players);
-    });
-    client.channels.get(`room-${roomId}`).subscribe("click", (message) => {
-      const newClicks = [...clicks];
-      const newClick = message.data;
-      !newClicks.includes(newClick) && newClicks.push(newClick);
-
-      setClicks(newClicks);
-    });
   }, [roomId]);
+
+  useEffect(() => {
+    client.channels.get(`room-${roomId}`).subscribe("click", (message) => {
+      const newClick = message.data;
+
+      if (clicks.length === 0) {
+        setClicks([newClick]);
+        return;
+      }
+      let found = false;
+      for (let i = 0; i < clicks.length; i++) {
+        if (clicks[i].userId === newClick.userId) {
+          found = true;
+        }
+      }
+      if (!found) {
+        const newClicks = [...clicks, newClick];
+        setClicks(newClicks);
+      }
+    });
+  }, [clicks]);
+
+  useEffect(() => {
+    client.channels.get(`room-${roomId}`).unsubscribe("join");
+    client.channels.get(`room-${roomId}`).subscribe("join", (message) => {
+      const newPlayers = [...players];
+      newPlayers.push(message.data);
+      setPlayers(newPlayers);
+    });
+  }, [players]);
 
   const startGame = () => {
     setStarted(true);
@@ -51,7 +67,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     client.channels.get(`room-${roomId}`).publish("clicks", clicks);
   }, [clicks]);
-  const readyToPlay = !started || clicks.length === 0;
+  const readyToPlay = started || clicks.length === 0;
 
   return (
     <div className="w-full h-screen flex items-center justify-center flex-col gap-6 fixed inset-0">
@@ -70,7 +86,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
         ))}
       </ol>
       {!started && <>{qrCodeUrl ? <img src={qrCodeUrl} alt="QR Code" width={300} /> : <p>Generating QR code...</p>}</>}
-      <Button onClick={startGame} className={`w-full h-20 fixed left-0 right-0 bottom-0 text-4xl ${readyToPlay && "opacity-50 pointer-events-none"}`}>
+      <Button onClick={startGame} className={`w-full h-20 fixed left-0 right-0 bottom-0 text-4xl ${!readyToPlay && "opacity-50 pointer-events-none"}`}>
         Start Game
       </Button>
     </div>
