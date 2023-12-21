@@ -18,7 +18,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
   const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   useEffect(() => {
-    QRCode.toDataURL(`http://localhost:3300/game/play/{roomId}`, { errorCorrectionLevel: "H" })
+    QRCode.toDataURL(`https://buzzer-game-delta.vercel.app/game/play/{roomId}`, { errorCorrectionLevel: "H" })
       .then((url: string) => {
         setQrCodeUrl(url);
       })
