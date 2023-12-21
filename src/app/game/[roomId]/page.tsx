@@ -51,7 +51,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
   useEffect(() => {
     client.channels.get(`room-${roomId}`).publish("clicks", clicks);
   }, [clicks]);
-  const readyToPlay = (players.length !== 0 && !started) || clicks.length === 0;
+  const readyToPlay = !started || clicks.length === 0;
 
   return (
     <div className="w-full h-screen flex items-center justify-center flex-col gap-6 fixed inset-0">
