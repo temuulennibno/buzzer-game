@@ -43,7 +43,7 @@ export default function Page({ params }: { params: { roomId: string } }) {
         setClicks(message.data);
       });
     } else {
-      const name = prompt("Insert your name?", "Player");
+      const name = prompt("Insert your name?", "");
       setName(`${name}`);
     }
   }, [name]);
