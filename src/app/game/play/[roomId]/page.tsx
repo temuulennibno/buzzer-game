@@ -55,9 +55,11 @@ export default function Page({ params }: { params: { roomId: string } }) {
     <div className="w-full h-screen flex items-center justify-center flex-col gap-6 bg-[#424242] absolute inset-0">
       <Image src={image} alt={""} width={300} height={300} style={{ transform: "translateX(-50%)" }} className="fixed top-0 left-1/2" />
       {position !== -1 && <>{clicks.length > 0 && <h1 className="text-white font-bold text-5xl">You clicked #{getPosition()}</h1>}</>}
-      <Button className={`w-full h-20 fixed left-0 right-0 bottom-0 text-4xl ${waiting && "opacity-50 pointer-events-none"}`} color="red" disabled={waiting} onClick={buzz}>
-        {waiting ? "Waiting for host..." : "BUZZ"}
-      </Button>
+      {position === -1 && (
+        <Button className={`w-full h-20 fixed left-0 right-0 bottom-0 text-4xl ${waiting && "opacity-50 pointer-events-none"}`} color="red" disabled={waiting} onClick={buzz}>
+          {waiting ? "Waiting for host..." : "BUZZ"}
+        </Button>
+      )}
     </div>
   );
 }
